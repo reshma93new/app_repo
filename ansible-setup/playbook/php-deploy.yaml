@@ -86,7 +86,7 @@
   
   - name: Copying the Directory's contents (sub directories/files)
     copy:
-      src: ../website/
+      src: ../../website/
       dest:  /opt/docker-compose/website
       mode: 0644
   
