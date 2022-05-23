@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage ("SCM checkout") {
             steps {
-                git "https://github.com/reshma93new/projCert"
+                git "https://github.com/reshma93new/app_repo"
                 
             }
         }
