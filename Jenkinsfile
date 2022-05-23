@@ -8,7 +8,7 @@ pipeline {
     prod_env = "prod"
     php_registry = "registry.hub.docker.com/rakeshpb90/php-application"
     php_image_name =  "${php_registry}:${env.BUILD_NUMBER}"
-    nginx_registry = "registry.hub.docker.com/rakeshpb90/php-application"
+    nginx_registry = "registry.hub.docker.com/rakeshpb90/nginx"
     nginx_image_name =  "${nginx_registry}:${env.BUILD_NUMBER}"
     }  
 
