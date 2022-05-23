@@ -1,0 +1,16 @@
+--- 
+services:
+  nginx: 
+    container_name: nginx
+    image: {{ nginx_docker_image_name }}
+    links: 
+      - php
+    ports: 
+      - "8000:80"
+  php: 
+    image: {{ php_docker_image_name }}
+    container_name: php-app
+    volumes:
+      - ./website:/var/www
+    working_dir: /var/www/
+version: "3.8"

@@ -1,0 +1,109 @@
+- hosts: "{{ host_group }}"
+  become: yes
+  gather_facts: false
+  remote_user: ubuntu
+  tasks:
+  - name: Install docker packages
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    with_items:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+      - python3-pip
+      - virtualenv
+      - python3-setuptools
+    tags:
+      - docker
+  - name: Add Docker s official GPG key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+    tags:
+      - docker
+  - name: Verify that we have the key with the fingerprint
+
+    apt_key:
+      id: 0EBFCD88
+      state: present
+    tags:
+      - docker
+  - name: Set up the stable repository
+
+    apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+      state: present
+      update_cache: yes
+    tags:
+      - docker
+  - name: Update apt packages
+
+    apt:
+      update_cache: yes
+    tags:
+      - docker
+  - name: Install docker
+    apt:
+      name: docker-ce
+      state: present
+      update_cache: yes
+    #notify: Start docker on boot
+    tags:
+      - docker
+  - name: Install Docker Module for Python
+    pip:
+      name: docker
+
+  - name: Add remote "ubuntu" user to "docker" group
+    user:
+      name: "ubuntu"
+      group: "docker"
+      append: yes
+    tags:
+      - docker
+
+  # - name: "launch docker container"
+  #   docker_container:
+  #     name: "php-container"
+  #     image: "{{ docker_image_name }}"
+  #     state: started
+  #     recreate: yes
+  #     exposed_ports:
+  #     - 9000
+  #   register: docker_info
+
+  - name: Create directory structure
+    file:
+      path: "{{ item }}"
+      state: directory
+    with_items:
+      - /opt/docker-compose
+      - /opt/docker-compose/website
+
+  
+  - name: Copying the Directory's contents (sub directories/files)
+    copy:
+      src: ../website/
+      dest:  /opt/docker-compose/website
+      mode: 0644
+  
+
+  - name: Docker compose
+    template:
+      src: docker-compose.yaml.j2
+      dest: /opt/docker-compose/docker-compose.yaml
+      mode: 0644
+
+  - name: Deploy Nginx and PHP container
+    register: container
+    docker_compose:
+      project_src:  /opt/docker-compose/
+      files:
+        - docker-compose.yaml
+      pull: yes
+      state: present
+
+
